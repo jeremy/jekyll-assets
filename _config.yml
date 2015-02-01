@@ -12,3 +12,6 @@ github_username:  jekyll
 
 # Build settings
 markdown: kramdown
+
+# Extra plugins
+gems: [jekyll-assets]
