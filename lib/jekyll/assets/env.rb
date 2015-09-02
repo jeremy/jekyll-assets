@@ -45,6 +45,12 @@ module Jekyll
         end
       end
 
+      def all_linked_assets(cached = false)
+        all_assets(cached).flat_map do |asset|
+          find_all_linked_assets(asset.logical_path).to_a
+        end.to_set
+      end
+
       def extra_assets
         each_logical_path(*asset_config.fetch("assets", [])).map do |v|
           find_asset v
@@ -80,7 +86,7 @@ module Jekyll
       end
 
       private
-      def write_assets(assets = self.all_assets)
+      def write_assets(assets = self.all_linked_assets)
         self.class.assets_cache = assets
         self.class.digest_cache = Hash[assets.map do |a|
           [a.logical_path, a.digest]
@@ -92,7 +98,7 @@ module Jekyll
       end
 
       private
-      def write_cached_assets(assets = all_assets(true))
+      def write_cached_assets(assets = all_linked_assets(true))
         assets.each do |a|
           if !a.is_a?(Tag::ProxiedAsset)
             viejo = self.class.digest_cache[a.logical_path]
