@@ -28,10 +28,9 @@ module Jekyll
       end
 
       def in_cache_dir(*paths)
-        cache_dir = asset_config.fetch("cache", ".asset-cache") || nil
-        jekyll.in_source_dir(
-          cache_dir, *paths
-        )
+        paths.reduce(@cache_dir) do |base, path|
+          Jekyll.sanitized_path(base, path)
+        end
       end
 
       def cached_write?
@@ -167,9 +166,8 @@ module Jekyll
 
       private
       def setup_cache
-        if cache_dir = asset_config.fetch("cache", ".asset-cache")
-          self.cache = Sprockets::Cache::FileStore.new \
-            jekyll.in_source_dir(cache_dir)
+        if @cache_dir = asset_config.fetch("cache", ".asset-cache")
+          self.cache = Sprockets::Cache::FileStore.new @cache_dir
         end
       end
     end
